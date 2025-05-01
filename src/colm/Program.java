@@ -1,9 +1,7 @@
 package colm;
 
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class Program {
     public static void main(String[] args) {
@@ -34,7 +32,7 @@ public class Program {
 
         JButton loginButton = new JButton("Login");
         panel.add(loginButton);
-        //
+
         frame.add(panel);
         frame.setVisible(true);
 
@@ -72,12 +70,17 @@ public class Program {
 
             // Панель для отображения информации
             JPanel infoPanel = new JPanel();
-            infoPanel.setLayout(new GridLayout(6, 1));
+            infoPanel.setLayout(new GridLayout(8, 1)); // Увеличиваем количество строк для новых кнопок
+
+            // Компоненты для отображения данных
+            JLabel accountNumberLabel = new JLabel("Account Number: " + foundAccount.getAccountNumber());
+            JLabel ownerNameLabel = new JLabel("Owner Name: " + foundAccount.getOwner().getName());
+            JLabel balanceLabel = new JLabel("Balance: $" + foundAccount.getBalance());
 
             // Добавляем информацию о пользователе
-            infoPanel.add(new JLabel("Account Number: " + foundAccount.getAccountNumber()));
-            infoPanel.add(new JLabel("Owner Name: " + foundAccount.getOwner().getName()));
-            infoPanel.add(new JLabel("Balance: $" + foundAccount.getBalance()));
+            infoPanel.add(accountNumberLabel);
+            infoPanel.add(ownerNameLabel);
+            infoPanel.add(balanceLabel);
 
             // Кнопка "Exit Account"
             JButton exitButton = new JButton("Exit Account");
@@ -95,6 +98,30 @@ public class Program {
             });
             infoPanel.add(transactionHistoryButton);
 
+            // Кнопка "Deposit Funds"
+            JButton depositButton = new JButton("Deposit Funds");
+            depositButton.addActionListener(ev -> {
+                String amountStr = JOptionPane.showInputDialog(userInfoFrame, "Enter amount to deposit:");
+                try {
+                    double amount = Double.parseDouble(amountStr);
+
+                    // Проверка на положительное значение
+                    if (amount <= 0) {
+                        JOptionPane.showMessageDialog(userInfoFrame, "Amount must be positive!");
+                        return;
+                    }
+
+                    // Пополнение баланса
+                    foundAccount.deposit(amount);
+                    balanceLabel.setText("Balance: $" + foundAccount.getBalance());
+
+                    // Выводим сообщение об успешном пополнении
+                    JOptionPane.showMessageDialog(userInfoFrame, "Deposit successful!");
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(userInfoFrame, "Invalid amount entered!");
+                }
+            });
+            infoPanel.add(depositButton);
             // Кнопка "Transfer Funds"
             JButton transferFundsButton = new JButton("Transfer Funds");
             transferFundsButton.addActionListener(ev -> {
@@ -115,6 +142,10 @@ public class Program {
                         return;
                     }
                     if (foundAccount.transferFunds(targetAccount, amount)) {
+                        // Обновляем баланс
+                        balanceLabel.setText("Balance: $" + foundAccount.getBalance());
+
+                        // Выводим сообщение об успешном переводе
                         JOptionPane.showMessageDialog(userInfoFrame, "Transfer successful!");
                     } else {
                         JOptionPane.showMessageDialog(userInfoFrame, "Insufficient funds!");
@@ -124,6 +155,33 @@ public class Program {
                 }
             });
             infoPanel.add(transferFundsButton);
+
+
+            // Кнопка "Withdraw Funds"
+            JButton withdrawButton = new JButton("Withdraw Funds");
+            withdrawButton.addActionListener(ev -> {
+                String amountStr = JOptionPane.showInputDialog(userInfoFrame, "Enter amount to withdraw:");
+                try {
+                    double amount = Double.parseDouble(amountStr);
+
+                    // Проверка на положительное значение
+                    if (amount <= 0) {
+                        JOptionPane.showMessageDialog(userInfoFrame, "Amount must be positive!");
+                        return;
+                    }
+
+                    // Снятие средств
+                    if (foundAccount.withdraw(amount)) {
+                        balanceLabel.setText("Balance: $" + foundAccount.getBalance());
+                        JOptionPane.showMessageDialog(userInfoFrame, "Withdrawal successful!");
+                    } else {
+                        JOptionPane.showMessageDialog(userInfoFrame, "Insufficient funds!");
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(userInfoFrame, "Invalid amount entered!");
+                }
+            });
+            infoPanel.add(withdrawButton);
 
             userInfoFrame.add(infoPanel);
             userInfoFrame.setVisible(true);

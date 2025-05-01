@@ -51,16 +51,7 @@ public class AccountCheck {
         return true;
     }
 
-    // Перевод средств на другой счет
-    public boolean transfer(double amount, AccountCheck anotherAccount) {
-        if (withdraw(amount)) {
-            anotherAccount.deposit(amount);
-            transactionsHistory.add(new Transactions("Transfer to " + anotherAccount.getAccountNumber(), amount));
-            anotherAccount.transactionsHistory.add(new Transactions("Transfer from " + accountNumber, amount));
-            return true;
-        }
-        return false;
-    }
+
 
     public String getAccountNumber() {
         return accountNumber;
